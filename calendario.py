@@ -11,7 +11,7 @@ service = Service('/usr/local/bin/geckodriver')
 driver = webdriver.Firefox(service=service)
 
 # Define the URL of the economic calendar
-url = 'https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=72,17,4,5&calType=week&timeZone=40&lang=1" width="650" height="467" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"'
+url = 'https://sslecal2.investing.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=72,17,4,5&calType=day&timeZone=40&lang=1%22%20width=%22650%22%20height=%22467%22%20frameborder=%220%22%20allowtransparency=%22true%22%20marginwidth=%220%22%20marginheight=%220%22'
 # Load the economic calendar page in Firefox
 driver.get(url)
 
@@ -24,23 +24,17 @@ table = soup.find('table', {'class': 'genTable closedTable ecoCalTable'})
 # Get all the rows in the table
 rows = table.find_all('tr')
 
-# Initialize a list to hold the table data as tuples
-table_data = []
+# Get the headers
+headers = [header.text.strip() for header in rows[0].find_all("th")]
 
-# Loop through each row in the table
-for row in rows:
-    # Get all the columns in the row
-    cols = row.find_all('td')
-    
-    # Check if the row contains data (i.e., is not a header row)
-    if cols:
-        # Extract the text content of each cell in the row
-        row_data = [col.get_text().strip() for col in cols]
-        # Convert the row data to a tuple and append it to the table data list
-        table_data.append(tuple(row_data))
+# Get the data
+data = []
+for row in rows[1:]:
+    values = [value.text.strip() for value in row.find_all("td")]
+    d = dict(zip(headers, values))
+    if d["Time"] != "":
+        d.pop("Imp.", None)
+        data.append(d)
 
-# Print the table data as a list of tuples
-print(table_data)
-
-# Close the Firefox driver instance
+print(data)
 driver.quit()
