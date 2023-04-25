@@ -18,7 +18,7 @@ soup = BeautifulSoup(html, "html.parser")
 
 # find all elements with class "search-result-indiv"
 results = soup.find_all("h3", {"class": "search-result-title"})
-print(results)
+#print(results)
 # create an empty list to store the scraped data
 data = []
 
